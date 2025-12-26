@@ -1,4 +1,9 @@
 /* Global Styles */
+:root {
+    --prompter-vertical-padding: 20vh;
+    --prompter-horizontal-padding: 5vw;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -237,7 +242,7 @@ body {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
-    padding: 20vh 5vw;
+    padding: var(--prompter-vertical-padding) var(--prompter-horizontal-padding);
 }
 
 .prompter-text {

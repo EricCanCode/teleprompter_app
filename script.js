@@ -1,6 +1,15 @@
 // Teleprompter App with Speech Recognition
 class TeleprompterApp {
     constructor() {
+        // Constants
+        this.SCROLL_SPEED_MULTIPLIERS = {
+            slow: 0.7,
+            medium: 1.0,
+            fast: 1.3
+        };
+        this.MIN_MATCH_COUNT = 2;
+        this.INSTRUCTION_DELAY_MS = 500;
+
         // Elements
         this.setupScreen = document.getElementById('setupScreen');
         this.prompterScreen = document.getElementById('prompterScreen');
@@ -183,7 +192,7 @@ class TeleprompterApp {
         // Show instructions
         setTimeout(() => {
             this.showModal('Tap "Start Voice" to begin speech recognition. The teleprompter will scroll as you speak.');
-        }, 500);
+        }, this.INSTRUCTION_DELAY_MS);
     }
 
     toggleSpeech() {
@@ -315,7 +324,7 @@ class TeleprompterApp {
                 }
             }
 
-            if (matchCount > maxMatchCount && matchCount >= Math.min(2, spokenWords.length)) {
+            if (matchCount > maxMatchCount && matchCount >= Math.min(this.MIN_MATCH_COUNT, spokenWords.length)) {
                 maxMatchCount = matchCount;
                 bestMatchIndex = i;
             }
@@ -339,12 +348,7 @@ class TeleprompterApp {
         const maxScroll = container.scrollHeight - container.clientHeight;
         
         // Apply speed multiplier
-        let speedMultiplier = 1.0;
-        switch(this.scrollSpeed) {
-            case 'slow': speedMultiplier = 0.7; break;
-            case 'medium': speedMultiplier = 1.0; break;
-            case 'fast': speedMultiplier = 1.3; break;
-        }
+        const speedMultiplier = this.SCROLL_SPEED_MULTIPLIERS[this.scrollSpeed] || this.SCROLL_SPEED_MULTIPLIERS.medium;
 
         const targetScroll = maxScroll * scrollRatio * speedMultiplier;
         
