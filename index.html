@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Voice-Activated Teleprompter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Setup Screen -->
+        <div id="setupScreen" class="screen active">
+            <div class="header">
+                <h1>📝 Voice Teleprompter</h1>
+                <p class="subtitle">Upload or write your script, then let your voice control the scroll</p>
+            </div>
+
+            <div class="script-input-container">
+                <div class="input-method-tabs">
+                    <button class="tab-button active" data-tab="write">Write Script</button>
+                    <button class="tab-button" data-tab="upload">Upload File</button>
+                </div>
+
+                <div class="tab-content active" id="writeTab">
+                    <textarea 
+                        id="scriptInput" 
+                        placeholder="Type or paste your script here...
+                        
+Example:
+Hello everyone, welcome to my poetry channel.
+Today I'll be sharing my latest piece about nature.
+The sun rises over the mountains..."
+                        rows="10"
+                    ></textarea>
+                </div>
+
+                <div class="tab-content" id="uploadTab">
+                    <div class="upload-area">
+                        <input type="file" id="fileInput" accept=".txt" hidden>
+                        <label for="fileInput" class="upload-label">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Click to upload a text file</span>
+                            <span class="upload-hint">Supports .txt files</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Teleprompter Settings</h3>
+                    <div class="setting-item">
+                        <label for="fontSize">Font Size</label>
+                        <select id="fontSize">
+                            <option value="24">Small</option>
+                            <option value="32">Medium</option>
+                            <option value="42" selected>Large</option>
+                            <option value="52">Extra Large</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="scrollSpeed">Scroll Sensitivity</label>
+                        <select id="scrollSpeed">
+                            <option value="slow">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="fast">High</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="startButton" class="primary-button">Start Teleprompter</button>
+            </div>
+        </div>
+
+        <!-- Teleprompter Screen -->
+        <div id="prompterScreen" class="screen">
+            <div class="prompter-container">
+                <div id="prompterText" class="prompter-text"></div>
+            </div>
+
+            <div class="controls-overlay">
+                <div class="control-buttons">
+                    <button id="toggleSpeechButton" class="control-btn speech-btn">
+                        <span class="btn-icon">🎤</span>
+                        <span class="btn-label">Start Voice</span>
+                    </button>
+                    <button id="pauseButton" class="control-btn">
+                        <span class="btn-icon">⏸️</span>
+                        <span class="btn-label">Pause</span>
+                    </button>
+                    <button id="exitButton" class="control-btn">
+                        <span class="btn-icon">✖️</span>
+                        <span class="btn-label">Exit</span>
+                    </button>
+                </div>
+                <div id="statusIndicator" class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Modal -->
+        <div id="infoModal" class="modal">
+            <div class="modal-content">
+                <h2>⚠️ Important</h2>
+                <p id="modalMessage"></p>
+                <button id="modalCloseButton" class="primary-button">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
