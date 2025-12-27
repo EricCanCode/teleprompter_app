@@ -1016,13 +1016,24 @@ class TeleprompterApp {
     }
 
     toggleCameraPreview() {
+        if (!this.cameraPreview) {
+            console.error('Camera preview element not found');
+            return;
+        }
+        
         const isHidden = this.cameraPreview.classList.contains('hidden');
         if (isHidden) {
             this.cameraPreview.classList.remove('hidden');
-            this.toggleCameraButton.querySelector('.btn-label').textContent = 'Hide Cam';
+            if (this.toggleCameraButton) {
+                const label = this.toggleCameraButton.querySelector('.btn-label');
+                if (label) label.textContent = 'Hide Cam';
+            }
         } else {
             this.cameraPreview.classList.add('hidden');
-            this.toggleCameraButton.querySelector('.btn-label').textContent = 'Show Cam';
+            if (this.toggleCameraButton) {
+                const label = this.toggleCameraButton.querySelector('.btn-label');
+                if (label) label.textContent = 'Show Cam';
+            }
         }
     }
 }
