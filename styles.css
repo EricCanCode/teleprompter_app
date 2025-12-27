@@ -256,6 +256,27 @@ body {
     word-wrap: break-word;
 }
 
+/* Word highlighting styles */
+.prompter-text .word {
+    display: inline;
+    transition: all 0.3s ease;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.prompter-text .word.past {
+    color: #888;
+    opacity: 0.5;
+}
+
+.prompter-text .word.current {
+    background: rgba(102, 126, 234, 0.8);
+    color: #fff;
+    font-weight: bold;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+}
+
 /* Controls Overlay */
 .controls-overlay {
     position: fixed;
@@ -451,4 +472,261 @@ body {
 .app-container:fullscreen {
     width: 100%;
     height: 100%;
+}
+
+/* Theme Styles */
+.theme-light {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --text-past-color: #999999;
+    --highlight-color: rgba(102, 126, 234, 0.3);
+}
+
+.theme-dark {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --text-past-color: #666666;
+    --highlight-color: rgba(102, 126, 234, 0.8);
+}
+
+.theme-high-contrast {
+    --bg-color: #000000;
+    --text-color: #ffff00;
+    --text-past-color: #808000;
+    --highlight-color: rgba(255, 255, 0, 0.3);
+}
+
+.prompter-container {
+    background-color: var(--bg-color, #000);
+}
+
+.prompter-text {
+    color: var(--text-color, #fff);
+}
+
+.word.past {
+    color: var(--text-past-color, #888) !important;
+}
+
+.word.current {
+    background: var(--highlight-color, rgba(102, 126, 234, 0.8)) !important;
+}
+
+/* Mirror Mode */
+.mirror-mode .prompter-text {
+    transform: scaleX(-1);
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+/* Stats Display */
+.stats-display {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 20px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: bold;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Countdown Overlay */
+.countdown-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.countdown-overlay.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.countdown-number {
+    font-size: 120px;
+    font-weight: bold;
+    color: #fff;
+    animation: countdown-pulse 1s ease-in-out;
+}
+
+@keyframes countdown-pulse {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Script Info */
+.script-info {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+}
+
+/* Secondary Button */
+.secondary-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.secondary-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.secondary-button:active {
+    transform: translateY(0);
+}
+
+/* Camera Preview */
+.camera-preview {
+    position: absolute;
+    width: 320px;
+    height: 180px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 1500;
+    background-color: #000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.camera-preview.hidden {
+    display: none;
+}
+
+.camera-preview.top-right {
+    top: 60px;
+    right: 20px;
+}
+
+.camera-preview.top-left {
+    top: 60px;
+    left: 20px;
+}
+
+.camera-preview.bottom-right {
+    bottom: 100px;
+    right: 20px;
+}
+
+.camera-preview.bottom-left {
+    bottom: 100px;
+    left: 20px;
+}
+
+.camera-preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera-preview.mirror video {
+    transform: scaleX(-1);
+}
+
+/* Recording Indicator */
+.recording-indicator {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+}
+
+.recording-indicator.hidden {
+    display: none;
+}
+
+.rec-dot {
+    width: 12px;
+    height: 12px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    animation: rec-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes rec-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+}
+
+/* Recording Controls */
+.record-btn {
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%) !important;
+}
+
+.record-btn:hover {
+    background: linear-gradient(135deg, #ff3333 0%, #ff0000 100%) !important;
+}
+
+.stop-record-btn {
+    background: linear-gradient(135deg, #555 0%, #333 100%) !important;
+}
+
+.stop-record-btn:hover {
+    background: linear-gradient(135deg, #666 0%, #444 100%) !important;
+}
+
+.stop-record-btn.hidden {
+    display: none;
 }

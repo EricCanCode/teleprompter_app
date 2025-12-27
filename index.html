@@ -52,24 +52,116 @@ The sun rises over the mountains..."
                 </div>
 
                 <div class="settings-group">
-                    <h3>Teleprompter Settings</h3>
+                    <h3>Display Settings</h3>
                     <div class="setting-item">
                         <label for="fontSize">Font Size</label>
                         <select id="fontSize">
-                            <option value="24">Small</option>
-                            <option value="32">Medium</option>
-                            <option value="42" selected>Large</option>
-                            <option value="52">Extra Large</option>
+                            <option value="24">Small (24px)</option>
+                            <option value="32">Medium (32px)</option>
+                            <option value="42" selected>Large (42px)</option>
+                            <option value="52">Extra Large (52px)</option>
+                            <option value="64">Huge (64px)</option>
+                            <option value="72">Giant (72px)</option>
                         </select>
                     </div>
                     <div class="setting-item">
-                        <label for="scrollSpeed">Scroll Sensitivity</label>
-                        <select id="scrollSpeed">
-                            <option value="slow">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="fast">High</option>
+                        <label for="themeSelect">Theme</label>
+                        <select id="themeSelect">
+                            <option value="dark" selected>Dark Mode</option>
+                            <option value="light">Light Mode</option>
+                            <option value="high-contrast">High Contrast</option>
                         </select>
                     </div>
+                    <div class="setting-item">
+                        <label for="scrollPosition">Scroll Position</label>
+                        <select id="scrollPosition">
+                            <option value="top">Top Third</option>
+                            <option value="center" selected>Center</option>
+                            <option value="bottom">Bottom Third</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="mirrorMode">
+                            Mirror Mode (for teleprompter rigs)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Voice Settings</h3>
+                    <div class="setting-item">
+                        <label for="speechSensitivity">Speech Sensitivity</label>
+                        <select id="speechSensitivity">
+                            <option value="0.5">Very Slow</option>
+                            <option value="0.75">Slow</option>
+                            <option value="1" selected>Normal</option>
+                            <option value="1.25">Fast</option>
+                            <option value="1.5">Very Fast</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="countdownEnabled" checked>
+                            3-Second Countdown Before Start
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Recording Settings</h3>
+                    <div class="setting-item">
+                        <label for="cameraSelect">Camera</label>
+                        <select id="cameraSelect">
+                            <option value="">Select camera...</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="videoQuality">Video Quality</label>
+                        <select id="videoQuality">
+                            <option value="4k">4K (2160p)</option>
+                            <option value="1080p" selected>Full HD (1080p)</option>
+                            <option value="720p">HD (720p)</option>
+                            <option value="480p">SD (480p)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="cameraPosition">Camera Preview Position</label>
+                        <select id="cameraPosition">
+                            <option value="top-right" selected>Top Right</option>
+                            <option value="top-left">Top Left</option>
+                            <option value="bottom-right">Bottom Right</option>
+                            <option value="bottom-left">Bottom Left</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="mirrorCamera" checked>
+                            Mirror Camera Preview
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="hidePreviewDuringRecording">
+                            Hide Preview While Recording
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Saved Scripts</h3>
+                    <div class="setting-item">
+                        <select id="savedScripts" style="width: 100%; margin-bottom: 10px;">
+                            <option value="">Load a saved script...</option>
+                        </select>
+                        <button id="saveScriptButton" class="secondary-button" style="width: 100%; margin-bottom: 5px;">💾 Save Current Script</button>
+                        <button id="deleteScriptButton" class="secondary-button" style="width: 100%;">🗑️ Delete Selected Script</button>
+                    </div>
+                </div>
+
+                <div class="script-info">
+                    <span id="wordCount">Words: 0</span> | 
+                    <span id="readingTime">Est. Time: 0:00</span>
                 </div>
 
                 <button id="startButton" class="primary-button">Start Teleprompter</button>
@@ -78,21 +170,59 @@ The sun rises over the mountains..."
 
         <!-- Teleprompter Screen -->
         <div id="prompterScreen" class="screen">
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            
             <div class="prompter-container">
                 <div id="prompterText" class="prompter-text"></div>
             </div>
 
+            <!-- Camera Preview -->
+            <div id="cameraPreview" class="camera-preview hidden">
+                <video id="cameraVideo" autoplay muted playsinline></video>
+                <div class="recording-indicator hidden" id="recordingIndicator">
+                    <span class="rec-dot"></span>
+                    <span id="recordingTimer">00:00</span>
+                </div>
+            </div>
+
             <div class="controls-overlay">
+                <div class="stats-display">
+                    <span id="speedIndicator">0 WPM</span>
+                    <span id="progressText">0%</span>
+                </div>
+                
                 <div class="control-buttons">
+                    <button id="startRecordingButton" class="control-btn record-btn" title="Start Recording (Ctrl+R)">
+                        <span class="btn-icon">⏺</span>
+                        <span class="btn-label">Record</span>
+                    </button>
+                    <button id="rewindButton" class="control-btn" title="Rewind 10 words (← key)">
+                        <span class="btn-icon">⏪</span>
+                        <span class="btn-label">-10</span>
+                    </button>
                     <button id="toggleSpeechButton" class="control-btn speech-btn">
                         <span class="btn-icon">🎤</span>
                         <span class="btn-label">Start Voice</span>
                     </button>
-                    <button id="pauseButton" class="control-btn">
+                    <button id="pauseButton" class="control-btn" title="Pause (Space key)">
                         <span class="btn-icon">⏸️</span>
                         <span class="btn-label">Pause</span>
                     </button>
-                    <button id="exitButton" class="control-btn">
+                    <button id="forwardButton" class="control-btn" title="Forward 10 words (→ key)">
+                        <span class="btn-icon">⏩</span>
+                        <span class="btn-label">+10</span>
+                    </button>
+                    <button id="resetButton" class="control-btn" title="Reset to start (R key)">
+                        <span class="btn-icon">↺</span>
+                        <span class="btn-label">Reset</span>
+                    </button>
+                    <button id="stopRecordingButton" class="control-btn stop-record-btn hidden" title="Stop Recording (Ctrl+R)">
+                        <span class="btn-icon">⏹</span>
+                        <span class="btn-label">Stop Rec</span>
+                    </button>
+                    <button id="exitButton" class="control-btn" title="Exit (Esc key)">
                         <span class="btn-icon">✖️</span>
                         <span class="btn-label">Exit</span>
                     </button>
@@ -101,6 +231,10 @@ The sun rises over the mountains..."
                     <span class="status-dot"></span>
                     <span class="status-text">Ready</span>
                 </div>
+            </div>
+            
+            <div id="countdownOverlay" class="countdown-overlay hidden">
+                <div id="countdownNumber" class="countdown-number">3</div>
             </div>
         </div>
 
