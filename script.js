@@ -916,12 +916,26 @@ class TeleprompterApp {
                 await this.switchCamera(deviceId || undefined);
             }
 
-            // Setup MediaRecorder
-            const options = { mimeType: 'video/webm;codecs=vp9,opus' };
-            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                options.mimeType = 'video/webm';
+            // Setup MediaRecorder - try MP4 first for iOS compatibility
+            let options;
+            let fileExtension = 'mp4';
+            
+            if (MediaRecorder.isTypeSupported('video/mp4')) {
+                options = { mimeType: 'video/mp4' };
+                fileExtension = 'mp4';
+            } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
+                options = { mimeType: 'video/webm;codecs=vp9,opus' };
+                fileExtension = 'webm';
+            } else if (MediaRecorder.isTypeSupported('video/webm')) {
+                options = { mimeType: 'video/webm' };
+                fileExtension = 'webm';
+            } else {
+                options = {}; // Use default
+                fileExtension = 'webm';
             }
 
+            this.recordingMimeType = options.mimeType || 'video/webm';
+            this.recordingExtension = fileExtension;
             this.mediaRecorder = new MediaRecorder(this.cameraStream, options);
             this.recordedChunks = [];
 
@@ -995,10 +1009,12 @@ class TeleprompterApp {
     }
 
     saveRecording() {
-        const blob = new Blob(this.recordedChunks, { type: 'video/webm' });
+        const mimeType = this.recordingMimeType || 'video/webm';
+        const extension = this.recordingExtension || 'webm';
+        const blob = new Blob(this.recordedChunks, { type: mimeType });
         const url = URL.createObjectURL(blob);
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-        const filename = `teleprompter-recording-${timestamp}.webm`;
+        const filename = `teleprompter-recording-${timestamp}.${extension}`;
 
         const a = document.createElement('a');
         a.style.display = 'none';
