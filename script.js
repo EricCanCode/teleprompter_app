@@ -803,7 +803,11 @@ class TeleprompterApp {
     // Camera and Recording Methods
     async initCamera() {
         try {
-            // Get list of video devices
+            // Request camera permission first (especially important for iOS)
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            stream.getTracks().forEach(track => track.stop()); // Stop the test stream
+            
+            // Now get list of video devices (with labels)
             const devices = await navigator.mediaDevices.enumerateDevices();
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
             
@@ -811,24 +815,26 @@ class TeleprompterApp {
             this.cameraSelect.innerHTML = '';
             videoDevices.forEach((device, index) => {
                 const option = document.createElement('option');
-                option.value = device.deviceId;
+                option.value = device.deviceId || ''; // Handle empty deviceId on some devices
                 option.textContent = device.label || `Camera ${index + 1}`;
                 this.cameraSelect.appendChild(option);
             });
 
             // Auto-select first camera if available
             if (videoDevices.length > 0) {
-                this.cameraSelect.value = videoDevices[0].deviceId;
+                this.cameraSelect.value = videoDevices[0].deviceId || '';
+                // For iOS/Safari, if deviceId is empty, we'll use default camera
+                if (!this.cameraSelect.value) {
+                    this.cameraSelect.selectedIndex = 0;
+                }
             }
         } catch (err) {
             console.error('Error listing cameras:', err);
-            this.showModal('Could not access cameras. Please check permissions.');
+            this.showModal('Could not access cameras. Please allow camera permissions in your browser settings.');
         }
     }
 
     async switchCamera(deviceId) {
-        if (!deviceId) return;
-
         try {
             // Stop existing stream
             if (this.cameraStream) {
@@ -838,14 +844,20 @@ class TeleprompterApp {
             // Get video quality settings
             const quality = this.getVideoQuality();
 
-            // Start new stream with selected camera
-            this.cameraStream = await navigator.mediaDevices.getUserMedia({
-                video: {
+            // Build constraints
+            const constraints = {
+                video: deviceId ? {
                     deviceId: { exact: deviceId },
+                    ...quality
+                } : {
+                    facingMode: 'user', // Default to front camera on mobile
                     ...quality
                 },
                 audio: true
-            });
+            };
+
+            // Start new stream with selected camera
+            this.cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
 
             this.cameraVideo.srcObject = this.cameraStream;
             this.cameraPreview.classList.remove('hidden');
@@ -893,11 +905,8 @@ class TeleprompterApp {
             // Make sure camera is active
             if (!this.cameraStream) {
                 const deviceId = this.cameraSelect.value;
-                if (!deviceId) {
-                    this.showModal('Please select a camera first.');
-                    return;
-                }
-                await this.switchCamera(deviceId);
+                // Start camera - if deviceId is empty (iOS), getUserMedia will use default camera
+                await this.switchCamera(deviceId || undefined);
             }
 
             // Setup MediaRecorder
