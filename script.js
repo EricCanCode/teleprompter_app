@@ -51,6 +51,7 @@ class TeleprompterApp {
         this.rewindButton = document.getElementById('rewindButton');
         this.forwardButton = document.getElementById('forwardButton');
         this.resetButton = document.getElementById('resetButton');
+        this.toggleCameraButton = document.getElementById('toggleCameraButton');
         this.statusIndicator = document.getElementById('statusIndicator');
         this.fontSizeSelect = document.getElementById('fontSize');
         this.themeSelect = document.getElementById('themeSelect');
@@ -221,6 +222,7 @@ class TeleprompterApp {
         this.rewindButton.addEventListener('click', () => this.skipWords(-10));
         this.forwardButton.addEventListener('click', () => this.skipWords(10));
         this.resetButton.addEventListener('click', () => this.resetPosition());
+        this.toggleCameraButton.addEventListener('click', () => this.toggleCameraPreview());
         this.exitButton.addEventListener('click', () => this.exitTeleprompter());
         
         // Recording controls
@@ -403,6 +405,11 @@ class TeleprompterApp {
             case 'R':
                 e.preventDefault();
                 this.resetPosition();
+                break;
+            case 'v':
+            case 'V':
+                e.preventDefault();
+                this.toggleCameraPreview();
                 break;
             case 'Escape':
                 e.preventDefault();
@@ -1006,6 +1013,17 @@ class TeleprompterApp {
         }, 100);
 
         this.recordedChunks = [];
+    }
+
+    toggleCameraPreview() {
+        const isHidden = this.cameraPreview.classList.contains('hidden');
+        if (isHidden) {
+            this.cameraPreview.classList.remove('hidden');
+            this.toggleCameraButton.querySelector('.btn-label').textContent = 'Hide Cam';
+        } else {
+            this.cameraPreview.classList.add('hidden');
+            this.toggleCameraButton.querySelector('.btn-label').textContent = 'Show Cam';
+        }
     }
 }
 
