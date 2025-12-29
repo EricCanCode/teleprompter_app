@@ -438,7 +438,10 @@ class TeleprompterApp {
 
     // Progress and Stats Methods
     updateProgress() {
-        const progress = (this.currentWordIndex / this.scriptWords.length) * 100;
+        // Calculate progress (excluding line breaks from count)
+        const totalWords = this.scriptWords.filter(w => w !== '\n').length;
+        const currentWords = this.scriptWords.slice(0, this.currentWordIndex + 1).filter(w => w !== '\n').length;
+        const progress = (currentWords / totalWords) * 100;
         this.progressBar.style.width = `${progress}%`;
         this.progressText.textContent = `${Math.round(progress)}%`;
     }
@@ -491,8 +494,24 @@ class TeleprompterApp {
             return;
         }
 
-        // Prepare script
-        this.scriptWords = this.currentScript.split(/\s+/);
+        // Prepare script - preserve line breaks by splitting more carefully
+        const lines = this.currentScript.split('\n');
+        this.scriptWords = [];
+        
+        lines.forEach((line, lineIndex) => {
+            const words = line.trim().split(/\s+/).filter(w => w.length > 0);
+            
+            if (words.length > 0) {
+                this.scriptWords.push(...words);
+            }
+            
+            // Add line break marker after each line (except the last)
+            // This preserves empty lines (stanzas) and normal line breaks
+            if (lineIndex < lines.length - 1) {
+                this.scriptWords.push('\n');
+            }
+        });
+        
         this.currentWordIndex = 0;
 
         // Get settings
@@ -529,19 +548,33 @@ class TeleprompterApp {
         // Clear existing content
         this.prompterText.innerHTML = '';
 
+        let currentLine = document.createElement('div');
+        currentLine.className = 'poem-line';
+        
         // Create spans for each word
         this.scriptWords.forEach((word, index) => {
-            const span = document.createElement('span');
-            span.textContent = word;
-            span.className = 'word';
-            span.dataset.index = index;
-            
-            // Add space after word (except last word)
-            this.prompterText.appendChild(span);
-            if (index < this.scriptWords.length - 1) {
-                this.prompterText.appendChild(document.createTextNode(' '));
+            if (word === '\n') {
+                // Finish current line and start a new one
+                this.prompterText.appendChild(currentLine);
+                currentLine = document.createElement('div');
+                currentLine.className = 'poem-line';
+            } else {
+                const span = document.createElement('span');
+                span.textContent = word;
+                span.className = 'word';
+                span.dataset.index = index;
+                
+                currentLine.appendChild(span);
+                
+                // Add space after word (except before line breaks or last word)
+                if (index < this.scriptWords.length - 1 && this.scriptWords[index + 1] !== '\n') {
+                    currentLine.appendChild(document.createTextNode(' '));
+                }
             }
         });
+        
+        // Append the last line
+        this.prompterText.appendChild(currentLine);
     }
 
     highlightCurrentWord(index) {
@@ -723,10 +756,18 @@ class TeleprompterApp {
     advanceWords(count) {
         // Advance by the specified number of words (adjusted by sensitivity)
         const adjustedCount = Math.round(count * this.speechSensitivity);
-        this.currentWordIndex = Math.min(
-            this.currentWordIndex + adjustedCount,
-            this.scriptWords.length - 1
-        );
+        let wordsToAdvance = adjustedCount;
+        let newIndex = this.currentWordIndex;
+        
+        // Skip over line breaks when advancing
+        while (wordsToAdvance > 0 && newIndex < this.scriptWords.length - 1) {
+            newIndex++;
+            if (this.scriptWords[newIndex] !== '\n') {
+                wordsToAdvance--;
+            }
+        }
+        
+        this.currentWordIndex = Math.min(newIndex, this.scriptWords.length - 1);
         this.scrollToPosition(this.currentWordIndex);
         this.wordsSpoken += adjustedCount;
         this.updateProgress();

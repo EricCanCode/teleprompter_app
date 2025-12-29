@@ -249,16 +249,36 @@ body {
     color: #fff;
     font-size: 42px;
     line-height: 1.8;
-    text-align: center;
+    text-align: left;
     padding: 20px;
     text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-    white-space: pre-wrap;
+    white-space: normal;
     word-wrap: break-word;
+    max-width: 90%;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Line break styling */
+.poem-line {
+    display: block !important;
+    min-height: 1.8em;
+    margin: 0;
+    padding: 0;
+    clear: both;
+    width: 100%;
+}
+
+.prompter-text br {
+    display: block;
+    content: "";
+    margin: 0;
+    line-height: 1.8;
 }
 
 /* Word highlighting styles */
 .prompter-text .word {
-    display: inline;
+    display: inline-block;
     transition: all 0.3s ease;
     padding: 2px 4px;
     border-radius: 4px;
